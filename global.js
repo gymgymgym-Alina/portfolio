@@ -15,7 +15,7 @@ currentLink?.classList.add("current");
 ----------------------------*/
 
 /* ---------- Step 3: automatic navigation menu ---------- */
-const BASE_PATH =
+export const BASE_PATH =
   location.hostname === "localhost" || location.hostname === "127.0.0.1"
     ? "/"
     : "/portfolio/";
@@ -95,3 +95,73 @@ form?.addEventListener("submit", (event) => {
 
   location.href = `${form.action}?${params.join("&")}`;
 });
+
+/* ---------- Lab 4, Step 1.2: fetch and parse JSON ---------- */
+export async function fetchJSON(url) {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching or parsing JSON data:", error);
+  }
+}
+
+/* ---------- Lab 4, Step 1.4: render an array of projects ---------- */
+const HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"];
+
+function resolveImage(image) {
+  if (!image) return "";
+  return image.startsWith("http") ? image : BASE_PATH + image;
+}
+
+export function renderProjects(projects, containerElement, headingLevel = "h2") {
+  if (!(containerElement instanceof HTMLElement)) {
+    console.error("renderProjects: container is not an element:", containerElement);
+    return;
+  }
+
+  if (!HEADING_LEVELS.includes(headingLevel)) {
+    console.warn(`renderProjects: "${headingLevel}" is not a heading level, using h2.`);
+    headingLevel = "h2";
+  }
+
+  containerElement.innerHTML = "";
+
+  if (!Array.isArray(projects) || projects.length === 0) {
+    containerElement.innerHTML = `<p class="placeholder">No projects to show yet.</p>`;
+    return;
+  }
+
+  for (const project of projects) {
+    const title = project?.title ?? "Untitled project";
+    const description = project?.description ?? "No description yet.";
+    const year = project?.year;
+    const image = resolveImage(project?.image);
+
+    const article = document.createElement("article");
+    article.innerHTML = `
+      <${headingLevel}>${title}</${headingLevel}>
+      ${
+        image
+          ? `<img src="${image}" alt="${title}">`
+          : `<div class="placeholder-image" aria-hidden="true"></div>`
+      }
+      <div class="project-details">
+        <p>${description}</p>
+        ${year ? `<p class="project-year">c. ${year}</p>` : ""}
+      </div>
+    `;
+
+    containerElement.append(article);
+  }
+}
+
+/* ---------- Lab 4, Step 3.2: GitHub profile data ---------- */
+export async function fetchGitHubData(username) {
+  return fetchJSON(`https://api.github.com/users/${username}`);
+}

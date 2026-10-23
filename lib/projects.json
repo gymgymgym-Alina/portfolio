@@ -8,7 +8,7 @@
   {
     "title": "Deterministic Manuscript Consistency Checker",
     "year": 2026,
-    "image": "images/grass.JPG",
+    "image": "images/consist.png",
     "description": "Non-LLM checker that cross-references metric-value pairs across manuscript sections to flag self-contradictions. 22 unit tests, zero false positives on 8 adversarial near-miss cases."
   },
   {
